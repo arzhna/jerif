@@ -125,6 +125,13 @@ int stack_test(void){
     }
 }
 
+#define TEST_CASE_JSON_STR_01 "{\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":\"123-456-7890\", \"no\":1}"
+#define TEST_CASE_JSON_STR_02 "{\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":\"123-456-7890\", \"no\":1"
+#define TEST_CASE_JSON_STR_03 "{\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":\"123-456-7890, \"no\":1}"
+#define TEST_CASE_JSON_STR_04 "{\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":123-456-7890\", \"no\":1}"
+#define TEST_CASE_JSON_STR_05 "\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":\"123-456-7890\", \"no\":1}"
+#define TEST_CASE_JSON_STR_06 "\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":\"123-456-7890\", \"no\":1, }"
+
 int main (void)
 {
     printf("[STACK TEST]\n");
@@ -133,6 +140,8 @@ int main (void)
     }else{
         printf("Stack test is SUCCESS!!!\n\n");
     }
+
+    jerif_check_json_validation(TEST_CASE_JSON_STR_01);
 
     return 0;
 }
