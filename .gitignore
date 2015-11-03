@@ -1,0 +1,7 @@
+objs/
+bin/
+out/
+.tags*
+*.DS_Store
+*.log
+*_ver.h
