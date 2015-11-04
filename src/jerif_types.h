@@ -1,5 +1,5 @@
-#ifndef __TOAST_PFLAT_JERIF_TYPES_H__
-#define __TOAST_PFLAT_JERIF_TYPES_H__
+#ifndef __JERIF_TYPES_H__
+#define __JERIF_TYPES_H__
 
 // error code
 typedef unsigned int jerif_err;
@@ -15,4 +15,4 @@ typedef unsigned int jerif_bool;
 #define jerif_false 0
 
 
-#endif //__TOAST_PFLAT_JERIF_TYPES_H__
+#endif //__JERIF_TYPES_H__
