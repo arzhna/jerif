@@ -1,5 +1,5 @@
-#ifndef __TOAST_PFLAT_JERIF_STACK_H__
-#define __TOAST_PFLAT_JERIF_STACK_H__
+#ifndef __JERIF_STACK_H__
+#define __JERIF_STACK_H__
 
 #include "jerif_types.h"
 
@@ -15,4 +15,4 @@ jerif_err jerif_stack_pop(jerif_stack* s, char* item);
 
 void jerif_stack_dump (jerif_stack* s);
 
-#endif //__TOAST_PFLAT_JERIF_STACK_H__
+#endif //__JERIF_STACK_H__
