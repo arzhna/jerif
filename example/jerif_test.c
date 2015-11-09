@@ -125,33 +125,32 @@ int stack_test(void){
     }
 }
 
-#define VALIDATOR_TEST_CASE_COUNT 12
+#define VALIDATOR_TEST_CASE_COUNT 10
 char *TEST_CASE_JSON_STR[] = {
-    "{\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":\"123-456-7890\", \"no\":1, \"valid\":true}",
-    "{\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":\"123-456-7890\", \"no\":1, \"valid\":true",
-    "{\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":\"123-456-7890, \"no\":1, \"valid\":true}",
-    "{\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":123-456-7890\", \"no\":1, \"valid\":true}",
-    "\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":\"123-456-7890\", \"no\":1, \"valid\":true}",
-    "\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":\"123-456-7890\", \"no\":1 \"valid\":true,}",
-    "\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":\"123-456-7890\", \"no\":1, \"valid\":true",
-    "\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":\"123-456-7890\", \"no\":1, {\"valid\":true}",
-    "{\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":[\"123-456-7890\", \"234-567-8901\"], \"no\":1, \"valid\":true}",
-    "{\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":\"123-456-7890\", \"no\":[1, 2], \"valid\":true}",
-    "{\"name\": \"arzhna\", \"address\": \"seoul\", \"tel\": [\"123-456-7890\", \"123-456-7890\"], \"no\": [1, 2], \"group\": [{\"name\": \"pflat-dev\", \"no\": 1}, {\"name\": \"dev\", \"no\": 2}], \"valid\": true}",
-    "{\"name\":\"arzhna\", , \"address\":\"seoul\", \"tel\":\"123-456-7890\", \"no\":1, \"valid\":true}",
+    // valid case
+    "{\"string\":\"string\", \"int\":1, \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1, \"group\":{\"string\":\"string\", \"int\":1}, \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1, \"array\":[1, 2, 3], \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1, \"array\":[\"string1\", \"string2\", \"string3\"], \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1, \"array\":[{\"int\":1, \"string\":\"string\"}, {\"int\":2, \"string\":\"string\"}, {\"int\":3, \"string\":\"string\"}], \"bool\":true}",
+
+    // invalid case
+    "{\"string\":\"string\", \"int\":1, \"bool\":true",
+    "\"string\":\"string\", \"int\":1, \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1, \"group\":{\"string\":\"string\", }, \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1, \"array\":[1, 2, 3, \"bool\":true}",
+    "{\"string\":\"string\", \"int\", 1, \"array\":[{\"int\":1, \"string\":\"string\"}, {\"int\":2, \"string\":\"string\"}, {\"int\":3, \"string\":\"string\"}], \"bool\":true}",
 };
 jerif_err TEST_CASE_RESULT[] = {
     jerif_ok,
-    jerif_err_invalid_json,
-    jerif_err_invalid_json,
-    jerif_err_invalid_json,
-    jerif_err_invalid_json,
-    jerif_err_invalid_json,
-    jerif_err_invalid_json,
-    jerif_err_invalid_json,
     jerif_ok,
     jerif_ok,
     jerif_ok,
+    jerif_ok,
+    jerif_err_invalid_json,
+    jerif_err_invalid_json,
+    jerif_err_invalid_json,
+    jerif_err_invalid_json,
     jerif_err_invalid_json,
 };
 
