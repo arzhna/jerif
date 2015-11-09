@@ -11,6 +11,7 @@ LIBS = -l$(LIB_NAME)
 
 # SOURCES
 SRCS = 	jerif.c \
+		jerif_check.c \
 		jerif_stack.c
 
 OBJS = $(SRCS:%.c=$(OBJ_PATH)/%.o)
