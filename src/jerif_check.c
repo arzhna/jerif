@@ -25,7 +25,7 @@ jerif_bool is_pair(jerif_stack *s)
         }
     }
 
-    if(((qoute_count%2)!=0) || (brace_toggle!=0)){
+    if(((qoute_count%2)!=0) || (brace_toggle!=0) || (bracket_toggle!=0)){
         //printf("qoute_count: %d, brace_toggle: %d, bracket_toggle=%d\n", qoute_count, brace_toggle, bracket_toggle);
         return jerif_false;
     }else{
@@ -33,7 +33,7 @@ jerif_bool is_pair(jerif_stack *s)
     }
 }
 
-jerif_bool is_valid_item(char prev, char item)
+jerif_bool is_valid_item(char prev, char item, jerif_bool in_bracket)
 {
     jerif_bool result = jerif_true;
 
@@ -53,6 +53,7 @@ jerif_bool is_valid_item(char prev, char item)
             break;
         case SYMBOL_BRACE_OPEN:
             if( item!=SYMBOL_BRACKET_OPEN &&
+                item!=SYMBOL_COLON &&
                 item!=SYMBOL_COMMA){
                 result = jerif_false;
             }
@@ -98,11 +99,20 @@ jerif_bool is_valid_item(char prev, char item)
             }
             break;
         case SYMBOL_DATA:
-            if( item!=SYMBOL_BRACKET_OPEN &&
-                item!=SYMBOL_DOUBLE_QOUTE &&
-                item!=SYMBOL_COLON &&
-                item!=SYMBOL_COMMA ){
-                result = jerif_false;
+            if(in_bracket){
+                if( item!=SYMBOL_BRACKET_OPEN &&
+                    item!=SYMBOL_DOUBLE_QOUTE &&
+                    item!=SYMBOL_COLON &&
+                    item!=SYMBOL_COMMA ){
+                    result = jerif_false;
+                }
+            }
+            else{
+                if( item!=SYMBOL_BRACKET_OPEN &&
+                    item!=SYMBOL_DOUBLE_QOUTE &&
+                    item!=SYMBOL_COLON ){
+                    result = jerif_false;
+                }
             }
             break;
         default:
@@ -112,7 +122,7 @@ jerif_bool is_valid_item(char prev, char item)
     return result;
 }
 
-jerif_bool is_valid_syntax(jerif_stack *stk, char prev_item)
+jerif_bool is_valid_syntax(jerif_stack *stk, char prev_item, jerif_bool in_bracket)
 {
     jerif_err err_code = jerif_ok;
     char item = 0;
@@ -127,11 +137,18 @@ jerif_bool is_valid_syntax(jerif_stack *stk, char prev_item)
     }
 
     //printf("%c %c\n", item, prev_item);
-    if(is_valid_item(prev_item, item) == jerif_false){
+
+    if(item == SYMBOL_BRACKET_CLOSE){
+        in_bracket = jerif_true;
+    }else if(item == SYMBOL_BRACKET_OPEN){
+        in_bracket = jerif_false;
+    }
+
+    if(is_valid_item(prev_item, item, in_bracket) == jerif_false){
         return jerif_false;
     }
     else{
-        return is_valid_syntax(stk, item);
+        return is_valid_syntax(stk, item, in_bracket);
     }
 }
 
@@ -139,8 +156,9 @@ jerif_err jerif_check_syntax(jerif_stack *stk)
 {
     jerif_err err_code = jerif_ok;
 
-    //jerif_stack_dump(&stk);
-    if(jerif_false == is_pair(stk) || jerif_false == is_valid_syntax(stk, 0)){
+    //jerif_stack_dump(stk);
+    if( (jerif_false == is_pair(stk)) ||
+        (jerif_false == is_valid_syntax(stk, 0, jerif_false))){
         err_code = jerif_err_invalid_json;
     }
 
