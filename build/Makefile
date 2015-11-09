@@ -10,7 +10,9 @@ LIB_FULL_NAME = lib$(LIB_NAME).a
 LIBS = -l$(LIB_NAME)
 
 # SOURCES
-SRCS = 	jerif_stack.c
+SRCS = 	jerif.c \
+		jerif_check.c \
+		jerif_stack.c
 
 OBJS = $(SRCS:%.c=$(OBJ_PATH)/%.o)
 

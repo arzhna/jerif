@@ -3,7 +3,7 @@
 
 #include "jerif_types.h"
 
-#define MAX_STACK_SIZE 32
+#define MAX_STACK_SIZE 512
 typedef struct {
     char stk[MAX_STACK_SIZE];
     int top;

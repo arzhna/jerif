@@ -25,10 +25,10 @@ int atoi(char c)
 
 int check_result(int condition){
     if(condition){
-        printf("==> SUCCESS\n");
+        printf("  ==> SUCCESS\n");
         return 1;
     }else{
-        printf("==> FAILED\n");
+        printf("  ==> FAILED\n");
         return 0;
     }
 }
@@ -47,16 +47,16 @@ int stack_test(void){
 
     err_code = jerif_stack_init(&stk);
     if(err_code){
-        printf("jerif_stack_init failed!\n");
+        printf("jerif_stack_init failed!, err_code=%d\n", err_code);
         return -1;
     }
 
     // test case #1: input 10 elements. and then if the top of stack is 9, ok.
-    printf("Test Case #1");
+    printf("Test Case #1\n");
     for(i=0; i<push_count; i++){
         err_code = jerif_stack_push(&stk, itoa(i));
         if(err_code){
-            printf("jerif_stack_push failed!\n");
+            printf("jerif_stack_push failed!, err_code=%d\n", err_code);
             return -1;
         }
     }
@@ -64,12 +64,12 @@ int stack_test(void){
     //jerif_stack_dump(&stk);
 
     // test case #2: pop 6 elements. and then if the top of stack is 3, ok.
-    printf("Test Case #2");
+    printf("Test Case #2\n");
     for(i=0; i<pop_count; i++){
         element = 0;
         err_code = jerif_stack_pop(&stk, &element);
         if(err_code){
-            printf("jerif_stack_pop failed!\n");
+            printf("jerif_stack_pop failed!, err_code=%d\n", err_code);
             return -1;
         }
     }
@@ -78,11 +78,11 @@ int stack_test(void){
 
 
     // test case #3: pop once. if it is ?, ok
-    printf("Test Case #3");
+    printf("Test Case #3\n");
     element = 0;
     err_code = jerif_stack_pop(&stk, &element);
     if(err_code){
-        printf("jerif_stack_pop failed!\n");
+        printf("jerif_stack_pop failed!, err_code=%d\n", err_code);
         return -1;
     }
     is_success = is_success + check_result(atoi(element) == ((push_count-pop_count)-1));
@@ -90,12 +90,12 @@ int stack_test(void){
     //jerif_stack_dump(&stk);
 
     // test case #4: pop reamained elements, and then pop once more. if err_code is stack_underflow, ok.
-    printf("Test Case #4");
+    printf("Test Case #4\n");
     for(i=0; i<(push_count-pop_count-1); i++){
         element = 0;
         err_code = jerif_stack_pop(&stk, &element);
         if(err_code){
-            printf("jerif_stack_pop failed!\n");
+            printf("jerif_stack_pop failed!, err_code=%d\n", err_code);
             return -1;
         }
     }
@@ -104,12 +104,12 @@ int stack_test(void){
     is_success = is_success + check_result(err_code==jerif_err_stack_underflow);
     //jerif_stack_dump(&stk);
 
-    // test case #4: push max, and then push once more. if err_code is stack_overflow, ok.
-    printf("Test Case #5");
+    // test case #5: push max, and then push once more. if err_code is stack_overflow, ok.
+    printf("Test Case #5\n");
     for(i=0; i<MAX_STACK_SIZE; i++){
-        err_code = jerif_stack_push(&stk, (char)(i+48));
+        err_code = jerif_stack_push(&stk, (char)((i&0x0F)+48));
         if(err_code){
-            printf("jerif_stack_push failed!\n");
+            printf("jerif_stack_push failed!, err_code=%d\n", err_code);
             return -1;
         }
     }
@@ -125,13 +125,71 @@ int stack_test(void){
     }
 }
 
+#define VALIDATOR_TEST_CASE_COUNT 10
+char *TEST_CASE_JSON_STR[] = {
+    // valid case
+    "{\"string\":\"string\", \"int\":1, \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1, \"group\":{\"string\":\"string\", \"int\":1}, \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1, \"array\":[1, 2, 3], \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1, \"array\":[\"string1\", \"string2\", \"string3\"], \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1, \"array\":[{\"int\":1, \"string\":\"string\"}, {\"int\":2, \"string\":\"string\"}, {\"int\":3, \"string\":\"string\"}], \"bool\":true}",
+
+    // invalid case
+    "{\"string\":\"string\", \"int\":1, \"bool\":true",
+    "\"string\":\"string\", \"int\":1, \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1, \"group\":{\"string\":\"string\", }, \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1, \"array\":[1, 2, 3, \"bool\":true}",
+    "{\"string\":\"string\", \"int\", 1, \"array\":[{\"int\":1, \"string\":\"string\"}, {\"int\":2, \"string\":\"string\"}, {\"int\":3, \"string\":\"string\"}], \"bool\":true}",
+};
+jerif_err TEST_CASE_RESULT[] = {
+    jerif_ok,
+    jerif_ok,
+    jerif_ok,
+    jerif_ok,
+    jerif_ok,
+    jerif_err_invalid_json,
+    jerif_err_invalid_json,
+    jerif_err_invalid_json,
+    jerif_err_invalid_json,
+    jerif_err_invalid_json,
+};
+
+int validator_test(void)
+{
+    int i=0;
+    int test_case = VALIDATOR_TEST_CASE_COUNT;
+    int success_count=0;
+    jerif_err err_code = jerif_ok;
+
+    for(i=0; i<test_case; i++){
+        printf("Test Case #%d\n", i+1);
+        err_code = jerif_check_validation(TEST_CASE_JSON_STR[i]);
+        success_count += check_result(err_code==TEST_CASE_RESULT[i]);
+    }
+
+    if(success_count >= test_case){
+        return 0;
+    }else{
+        return -1;
+    }
+}
+
 int main (void)
 {
+    jerif_err err_code = jerif_ok;
+
     printf("[STACK TEST]\n");
     if(stack_test()){
         printf("Stack test is FAILED!!!\n\n");
     }else{
         printf("Stack test is SUCCESS!!!\n\n");
+    }
+
+    printf("[VALIDATOR TEST]\n");
+    if(validator_test()){
+        printf("Validator test is FAILED!!!\n\n");
+    }else{
+        printf("Validator test is SUCCESS!!!\n\n");
     }
 
     return 0;
