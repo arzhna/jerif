@@ -125,7 +125,7 @@ int stack_test(void){
     }
 }
 
-#define VALIDATOR_TEST_CASE_COUNT 11
+#define VALIDATOR_TEST_CASE_COUNT 12
 char *TEST_CASE_JSON_STR[] = {
     "{\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":\"123-456-7890\", \"no\":1, \"valid\":true}",
     "{\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":\"123-456-7890\", \"no\":1, \"valid\":true",
@@ -138,6 +138,7 @@ char *TEST_CASE_JSON_STR[] = {
     "{\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":[\"123-456-7890\", \"234-567-8901\"], \"no\":1, \"valid\":true}",
     "{\"name\":\"arzhna\", \"address\":\"seoul\", \"tel\":\"123-456-7890\", \"no\":[1, 2], \"valid\":true}",
     "{\"name\": \"arzhna\", \"address\": \"seoul\", \"tel\": [\"123-456-7890\", \"123-456-7890\"], \"no\": [1, 2], \"group\": [{\"name\": \"pflat-dev\", \"no\": 1}, {\"name\": \"dev\", \"no\": 2}], \"valid\": true}",
+    "{\"name\":\"arzhna\", , \"address\":\"seoul\", \"tel\":\"123-456-7890\", \"no\":1, \"valid\":true}",
 };
 jerif_err TEST_CASE_RESULT[] = {
     jerif_ok,
@@ -151,6 +152,7 @@ jerif_err TEST_CASE_RESULT[] = {
     jerif_ok,
     jerif_ok,
     jerif_ok,
+    jerif_err_invalid_json,
 };
 
 int validator_test(void)
@@ -162,11 +164,9 @@ int validator_test(void)
 
     for(i=0; i<test_case; i++){
         printf("Test Case #%d\n", i+1);
-        err_code = jerif_check_json_validation(TEST_CASE_JSON_STR[i]);
+        err_code = jerif_check_validation(TEST_CASE_JSON_STR[i]);
         success_count += check_result(err_code==TEST_CASE_RESULT[i]);
     }
-
-    printf("%d\n",success_count);
 
     if(success_count >= test_case){
         return 0;
