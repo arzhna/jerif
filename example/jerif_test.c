@@ -125,23 +125,27 @@ int stack_test(void){
     }
 }
 
-#define VALIDATOR_TEST_CASE_COUNT 10
+#define VALIDATOR_TEST_CASE_COUNT  12    //10
 char *TEST_CASE_JSON_STR[] = {
     // valid case
-    "{\"string\":\"string\", \"int\":1, \"bool\":true}",
-    "{\"string\":\"string\", \"int\":1, \"group\":{\"string\":\"string\", \"int\":1}, \"bool\":true}",
-    "{\"string\":\"string\", \"int\":1, \"array\":[1, 2, 3], \"bool\":true}",
-    "{\"string\":\"string\", \"int\":1, \"array\":[\"string1\", \"string2\", \"string3\"], \"bool\":true}",
-    "{\"string\":\"string\", \"int\":1, \"array\":[{\"int\":1, \"string\":\"string\"}, {\"int\":2, \"string\":\"string\"}, {\"int\":3, \"string\":\"string\"}], \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1029384756, \"bool\":false }",
+    "{\"string\":\"string\", \"int\":1029384756, \"group\":{\"string\":\"string\", \"int\":88}, \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1029384756, \"array\":[11, 22, 33], \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1029384756, \"array\":[false, true, true], \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1029384756, \"array\":[\"abc\", \"def\", \"ghi\"], \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1029384756, \"array\":[\"string1\", \"string2\", \"string3\"], \"bool\":true}",
+    "{\"string\":\"string\", \"int\":1029384756, \"array\":[{\"int\":55, \"string\":\"string\"}, {\"int\":66, \"string\":\"string\"}, {\"int\":77, \"string\":\"string\"}], \"bool\":true}",
 
     // invalid case
     "{\"string\":\"string\", \"int\":1, \"bool\":true",
     "\"string\":\"string\", \"int\":1, \"bool\":true}",
     "{\"string\":\"string\", \"int\":1, \"group\":{\"string\":\"string\", }, \"bool\":true}",
     "{\"string\":\"string\", \"int\":1, \"array\":[1, 2, 3, \"bool\":true}",
-    "{\"string\":\"string\", \"int\", 1, \"array\":[{\"int\":1, \"string\":\"string\"}, {\"int\":2, \"string\":\"string\"}, {\"int\":3, \"string\":\"string\"}], \"bool\":true}",
+    "{\"string\":\"true_string\", \"int\", 1, \"array\":[{\"int\":1, \"string\":\"string\"}, {\"int\":2, \"string\":\"string\"}, {\"int\":3, \"string\":\"string\"}], \"bool\":true}",
 };
 jerif_err TEST_CASE_RESULT[] = {
+    jerif_ok,
+    jerif_ok,
     jerif_ok,
     jerif_ok,
     jerif_ok,
