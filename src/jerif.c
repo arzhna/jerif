@@ -35,8 +35,20 @@ jerif_err jerif_check_validation(const char* json_str)
                 break;
             }
         }else if(json_str[i]!=SYMBOL_SPACE){
+            char symbol = SYMBOL_DATA_STRING;
             if(data_toggle == jerif_false){
-                err_code = jerif_stack_push(&stk, SYMBOL_DATA);
+                // check boolean
+                if(json_str[i] == SYMBOL_DATA_BOOL_TRUE || json_str[i] == SYMBOL_DATA_BOOL_FALSE){
+                    if(jerif_check_boolean(&(json_str[i]))){
+                        symbol = SYMBOL_DATA_BOOLEAN;
+                    }
+                }
+                // check integer
+                if(jerif_check_integer(&(json_str[i]))){
+                    symbol = SYMBOL_DATA_INTEGER;
+                }
+
+                err_code = jerif_stack_push(&stk, symbol);
                 if(err_code){
                     break;
                 }

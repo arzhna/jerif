@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <regex.h>
 
 #include "jerif_rsc.h"
 #include "jerif_check.h"
@@ -37,6 +38,7 @@ jerif_bool is_valid_item(char prev, char item, jerif_bool in_bracket)
 {
     jerif_bool result = jerif_true;
 
+//    printf("%c %c (%d)\n", item, prev, in_bracket);
     switch(prev){
         case SYMBOL_NULL:
             if(item!=SYMBOL_BRACE_CLOSE){
@@ -47,7 +49,9 @@ jerif_bool is_valid_item(char prev, char item, jerif_bool in_bracket)
             if( item!=SYMBOL_BRACKET_CLOSE &&
                 item!=SYMBOL_DOUBLE_QOUTE &&
                 item!=SYMBOL_COLON &&
-                item!=SYMBOL_DATA){
+                item!=SYMBOL_DATA_STRING &&
+                item!=SYMBOL_DATA_INTEGER &&
+                item!=SYMBOL_DATA_BOOLEAN){
                 result = jerif_false;
             }
             break;
@@ -64,7 +68,9 @@ jerif_bool is_valid_item(char prev, char item, jerif_bool in_bracket)
                 item!=SYMBOL_DOUBLE_QOUTE &&
                 item!=SYMBOL_COLON &&
                 item!=SYMBOL_COMMA &&
-                item!=SYMBOL_DATA){
+                item!=SYMBOL_DATA_STRING &&
+                item!=SYMBOL_DATA_INTEGER &&
+                item!=SYMBOL_DATA_BOOLEAN){
                 result = jerif_false;
             }
             break;
@@ -79,7 +85,7 @@ jerif_bool is_valid_item(char prev, char item, jerif_bool in_bracket)
                 item!=SYMBOL_DOUBLE_QOUTE &&
                 item!=SYMBOL_COLON &&
                 item!=SYMBOL_COMMA &&
-                item!=SYMBOL_DATA){
+                item!=SYMBOL_DATA_STRING){
                 result = jerif_false;
             }
             break;
@@ -94,29 +100,33 @@ jerif_bool is_valid_item(char prev, char item, jerif_bool in_bracket)
                 item!=SYMBOL_BRACE_OPEN &&
                 item!=SYMBOL_BRACE_CLOSE &&
                 item!=SYMBOL_DOUBLE_QOUTE &&
-                item!=SYMBOL_DATA){
+                item!=SYMBOL_DATA_STRING &&
+                item!=SYMBOL_DATA_INTEGER &&
+                item!=SYMBOL_DATA_BOOLEAN){
                 result = jerif_false;
             }
             break;
-        case SYMBOL_DATA:
+        case SYMBOL_DATA_STRING:
+            if( item!=SYMBOL_DOUBLE_QOUTE ){
+                result = jerif_false;
+            }
+            break;
+        case SYMBOL_DATA_INTEGER:
+        case SYMBOL_DATA_BOOLEAN:
             if(in_bracket){
                 if( item!=SYMBOL_BRACKET_OPEN &&
-                    item!=SYMBOL_DOUBLE_QOUTE &&
                     item!=SYMBOL_COLON &&
                     item!=SYMBOL_COMMA ){
                     result = jerif_false;
                 }
-            }
-            else{
-                if( item!=SYMBOL_BRACKET_OPEN &&
-                    item!=SYMBOL_DOUBLE_QOUTE &&
-                    item!=SYMBOL_COLON ){
+            }else{
+                if( item!=SYMBOL_COLON ){
                     result = jerif_false;
                 }
             }
             break;
         default:
-            ;
+            result = jerif_true;
     }
 
     return result;
@@ -137,10 +147,9 @@ jerif_bool is_valid_syntax(jerif_stack *stk, char prev_item, jerif_bool in_brack
     }
 
     //printf("%c %c\n", item, prev_item);
-
-    if(item == SYMBOL_BRACKET_CLOSE){
+    if(prev_item == SYMBOL_BRACKET_CLOSE){
         in_bracket = jerif_true;
-    }else if(item == SYMBOL_BRACKET_OPEN){
+    }else if(prev_item == SYMBOL_BRACKET_OPEN){
         in_bracket = jerif_false;
     }
 
@@ -176,4 +185,42 @@ jerif_bool jerif_check_syntatic_symbol(char c)
     else{
         return jerif_false;
     }
+}
+
+jerif_bool jerif_check_boolean(const char* str)
+{
+    int status;
+    regex_t state;
+    const char *pattern = REGEX_PATTERN_BOOLEAN;
+
+    if (regcomp(&state, pattern, REG_EXTENDED)){
+        return jerif_false;
+    }
+
+    status = regexec(&state, str, 0, NULL, 0);
+    //printf("[%s] %s: %s\n", __FUNCTION__, str, status == 0 ? "match" : "no match");
+    if(status){
+        return jerif_false;
+    }
+
+    return jerif_true;
+}
+
+jerif_bool jerif_check_integer(const char* str)
+{
+    int status;
+    regex_t state;
+    const char *pattern = REGEX_PATTERN_INTEGER;
+
+    if (regcomp(&state, pattern, REG_EXTENDED)){
+        return jerif_false;
+    }
+
+    status = regexec(&state, str, 0, NULL, 0);
+    //printf("[%s] %s: %s(%d)\n", __FUNCTION__, str, status == 0 ? "match" : "no match", status);
+    if(status){
+        return jerif_false;
+    }
+
+    return jerif_true;
 }
