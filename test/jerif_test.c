@@ -128,7 +128,7 @@ int stack_test(void){
 #define VALIDATOR_TEST_CASE_COUNT  12    //10
 char *TEST_CASE_JSON_STR[] = {
     // valid case
-    "{\"string\":\"string\", \"int\":1029384756, \"bool\":false }",
+    "{\"string\":\"string\", \"int\":0.1, \"bool\":false }",
     "{\"string\":\"string\", \"int\":1029384756, \"group\":{\"string\":\"string\", \"int\":88}, \"bool\":true}",
     "{\"string\":\"string\", \"int\":1029384756, \"array\":[11, 22, 33], \"bool\":true}",
     "{\"string\":\"string\", \"int\":1029384756, \"array\":[false, true, true], \"bool\":true}",
