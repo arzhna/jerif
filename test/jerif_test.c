@@ -125,10 +125,10 @@ int stack_test(void){
     }
 }
 
-#define VALIDATOR_TEST_CASE_COUNT  12    //10
+#define VALIDATOR_TEST_CASE_COUNT  14    //10
 char *TEST_CASE_JSON_STR[] = {
-    // valid case
-    "{\"string\":\"string\", \"int\":0.1, \"bool\":false }",
+    // valid cases, 7
+    "{\"string\":\"100 strings\", \"int\":0.1, \"bool\":false }",
     "{\"string\":\"string\", \"int\":1029384756, \"group\":{\"string\":\"string\", \"int\":88}, \"bool\":true}",
     "{\"string\":\"string\", \"int\":1029384756, \"array\":[11, 22, 33], \"bool\":true}",
     "{\"string\":\"string\", \"int\":1029384756, \"array\":[false, true, true], \"bool\":true}",
@@ -136,12 +136,16 @@ char *TEST_CASE_JSON_STR[] = {
     "{\"string\":\"string\", \"int\":1029384756, \"array\":[\"string1\", \"string2\", \"string3\"], \"bool\":true}",
     "{\"string\":\"string\", \"int\":1029384756, \"array\":[{\"int\":55, \"string\":\"string\"}, {\"int\":66, \"string\":\"string\"}, {\"int\":77, \"string\":\"string\"}], \"bool\":true}",
 
-    // invalid case
+    // invalid cases, 5
     "{\"string\":\"string\", \"int\":1, \"bool\":true",
     "\"string\":\"string\", \"int\":1, \"bool\":true}",
     "{\"string\":\"string\", \"int\":1, \"group\":{\"string\":\"string\", }, \"bool\":true}",
     "{\"string\":\"string\", \"int\":1, \"array\":[1, 2, 3, \"bool\":true}",
     "{\"string\":\"true_string\", \"int\", 1, \"array\":[{\"int\":1, \"string\":\"string\"}, {\"int\":2, \"string\":\"string\"}, {\"int\":3, \"string\":\"string\"}], \"bool\":true}",
+
+    // complex cases, 2
+    "{\"problems\": [{\"Diabetes\": [{\"medications\": [{\"medicationsClasses\": [{\"className\": [{\"associatedDrug\": [{\"name\": \"asprin\", \"dose\": \"\", \"strength\": \"500 mg\"}], \"associatedDrug#2\": [{\"name\": \"somethingElse\", \"dose\": \"\", \"strength\": \"500 mg\"}]}], \"className2\": [{\"associatedDrug\": [{\"name\": \"asprin\", \"dose\": \"\",\"strength\": \"500 mg\"}], \"associatedDrug#2\": [{\"name\": \"somethingElse\", \"dose\": \"\", \"strength\": \"500 mg\"}]}]}]}], \"labs\": [{\"missing_field\": \"missing_value\"}]}], \"Asthma\": [{}]}]}",
+    "{\"id\": \"0001\", \"type\": \"donut\", \"name\": \"Cake\", \"ppu\": 0.55, \"batters\":{\"batter\":[{\"id\": \"1001\", \"type\": \"Regular\"},	{ \"id\": \"1002\", \"type\": \"Chocolate\" }, { \"id\": \"1003\", \"type\": \"Blueberry\" }, { \"id\": \"1004\", \"type\": \"Devil's Food\" }]}, \"topping\": [{ \"id\": \"5001\", \"type\": \"None\" }, { \"id\": \"5002\", \"type\": \"Glazed\" }, { \"id\": \"5005\", \"type\": \"Sugar\" }, { \"id\": \"5007\", \"type\": \"Powdered Sugar\" }, { \"id\": \"5006\", \"type\": \"Chocolate with Sprinkles\" }, { \"id\": \"5003\", \"type\": \"Chocolate\" }, { \"id\": \"5004\", \"type\": \"Maple\" }]}",
 };
 jerif_err TEST_CASE_RESULT[] = {
     jerif_ok,
@@ -156,6 +160,8 @@ jerif_err TEST_CASE_RESULT[] = {
     jerif_err_invalid_json,
     jerif_err_invalid_json,
     jerif_err_invalid_json,
+    jerif_ok,
+    jerif_ok,
 };
 
 int validator_test(void)

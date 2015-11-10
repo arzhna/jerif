@@ -66,7 +66,7 @@ void jerif_stack_dump (jerif_stack* s)
     else{
         int i;
 
-        printf ("dump stack\n");
+        printf ("dump stack, top=%d\n", s->top);
         for (i = s->top; i >= 0; i--){
             printf ("│ %c │\n", s->stk[i]);
         }

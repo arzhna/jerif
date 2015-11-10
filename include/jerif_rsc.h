@@ -2,7 +2,10 @@
 #define __JERIF_RSC_H__
 
 #define SYMBOL_NULL 0
-#define SYMBOL_SPACE ' '
+#define SYMBOL_TAB  9
+#define SYMBOL_LF   10
+#define SYMBOL_CR   13
+#define SYMBOL_SPACE 32
 
 #define SYMBOL_BRACE_OPEN    '{'
 #define SYMBOL_BRACE_CLOSE   '}'
@@ -23,7 +26,8 @@
 #define STR_TRUE    "true"
 #define STR_FALSE   "false"
 
-#define REGEX_PATTERN_BOOLEAN   "^(true|false)(,|}|]| ).*$"
-#define REGEX_PATTERN_INTEGER   "^[0-9]+(\\.)?[0-9]+(,|}|]| ).*$"
+#define REGEX_PATTERN_BOOLEAN   "^(true|false)(,|}|]| |\n|\r|\t).*$"
+#define REGEX_PATTERN_FLOAT     "^[0-9]+(\\.)[0-9]+(,|}|]| |\n|\r|\t)?.*$"
+#define REGEX_PATTERN_INTEGER   "^[0-9]+(,|}|]| |\n|\r|\t)?.*$"
 
 #endif //__JERIF_RSC_H__
