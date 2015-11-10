@@ -11,7 +11,10 @@ endif
 HOME_PATH = $(shell pwd)/..
 OBJ_PATH = $(HOME_PATH)/objs
 LIB_PATH = $(HOME_PATH)/lib
+BIN_PATH = $(HOME_PATH)/bin
 OUT_PATH = $(HOME_PATH)/out
+INC_PATH = $(HOME_PATH)/include
+SRC_PATH = $(HOME_PATH)/src
 
 # build tools
 MAKE = make

@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include "jerif_stack.h"
-#include "jerif.h"
+#include "jerif_check.h"
 
 #define DO_NOTHING()
 
