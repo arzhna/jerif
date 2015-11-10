@@ -24,6 +24,6 @@
 #define STR_FALSE   "false"
 
 #define REGEX_PATTERN_BOOLEAN   "^(true|false)(,|}|]| ).*$"
-#define REGEX_PATTERN_INTEGER   "^[0-9]+(,|}|]| ).*$"
+#define REGEX_PATTERN_INTEGER   "^[0-9]+(\\.)?[0-9]+(,|}|]| ).*$"
 
 #endif //__JERIF_RSC_H__
