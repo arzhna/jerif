@@ -26,3 +26,7 @@ CP = cp
 LN = ln
 MKDIR = mkdir
 TARBALL = tar cvf
+
+# version
+GIT_TAG = $(shell git describe master --abbrev=0)
+VER_MAJOR = $(firstword $(subst ., ,$(GIT_TAG)))

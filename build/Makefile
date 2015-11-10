@@ -8,7 +8,8 @@ LIBS = -l$(TARGET_NAME)
 
 # SOURCES
 SRCS = 	jerif_check.c \
-		jerif_stack.c
+		jerif_stack.c \
+		jerif_misc.c
 
 OBJS = $(SRCS:%.c=$(OBJ_PATH)/%.o)
 
@@ -21,11 +22,19 @@ DBG_FLAGS = -g
 CFLAGS = -W -O0 $(CCFLAGS) $(OPT_FLAGS) $(DBG_FLAGS )
 LDFLAGS = $(EXT_INC_PATH) $(EXT_LIBS_PATH) $(EXT_LIBS)
 
+# Version
+VERSION_FILE_NAME = jerif_ver
+ifneq ("$(wildcard $(INC_PATH)/$(VERSION_FILE_NAME).h)","")
+	VERSION_FILE_EXIST = y
+else
+	VERSION_FILE_EXIST = n
+endif
+
 # Target Sources
 TARGET_SRSC = jerif.c
 
 # Tester Target
-TESTER = jerif_test
+TESTER = libjerif_test
 TESTER_PATH = $(HOME_PATH)/test
 TESTER_SRCS = jerif_test.c
 TESTER_BIN_PATH = $(BIN_PATH)
@@ -34,13 +43,18 @@ TESTER_BIN_PATH = $(BIN_PATH)
 
 #.PHONY: all clean
 
-all: comment $(LIB_NAME) $(TESTER) $(TARGET_NAME)
+all: version $(LIB_NAME) $(TESTER) $(TARGET_NAME)
 
-comment:
-	@echo "======================"
-	@echo "= Build $(TARGET_NAME)"
-	@echo "======================"
+version:
+	@echo "========================="
+	@echo "= $(TARGET_NAME) $(GIT_TAG)"
+	@echo "========================="
+ifeq ($(VERSION_FILE_EXIST),n)
+	@echo "#define JERIF_VERSION \"$(GIT_TAG)\"" >> $(INC_PATH)/$(VERSION_FILE_NAME).tmp
+	@$(CP) -f $(INC_PATH)/$(VERSION_FILE_NAME).tmp $(INC_PATH)/$(VERSION_FILE_NAME).h
+	@$(RM) $(INC_PATH)/$(VERSION_FILE_NAME).tmp
 	@echo
+endif
 
 $(LIB_NAME): $(OBJS)
 	@echo
@@ -62,7 +76,6 @@ $(TESTER):
 	@echo "======================"
 	@`[ -d $(TESTER_BIN_PATH) ] || $(MKDIR) $(TESTER_BIN_PATH)`
 	$(CC) -o $(TESTER_BIN_PATH)/$@ $(TESTER_PATH)/$(TESTER_SRCS) $(INCS) $(LIBS_PATH) $(LIBS) $(CFLAGS) $(LDFLAGS)
-	@echo "======================"
 	@echo
 
 $(TARGET_NAME):
@@ -71,11 +84,11 @@ $(TARGET_NAME):
 	@echo "======================"
 	@`[ -d $(BIN_PATH) ] || $(MKDIR) $(BIN_PATH)`
 	$(CC) -o $(BIN_PATH)/$@ $(SRC_PATH)/$(TARGET_SRSC) $(INCS) $(LIBS_PATH) $(LIBS) $(CFLAGS) $(LDFLAGS)
-	@echo "======================"
 	@echo
 
 clean:
 	@echo "======================"
-	@echo "= Clean $(LIB_NAME) "
+	@echo "= Clean $(TARGET_NAME) "
 	@echo "======================"
-	$(RM) -rf $(OBJ_PATH) $(TESTER_PATH)/$(TESTER) $(LIB_PATH) $(TESTER_BIN_PATH)
+	$(RM) -rf $(OBJ_PATH) $(LIB_PATH) $(BIN_PATH) $(INC_PATH)/$(VERSION_FILE_NAME).h
+	@echo
