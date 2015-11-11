@@ -15,6 +15,7 @@
 #define SYMBOL_COLON         ':'
 #define SYMBOL_COMMA         ','
 
+#define SYMBOL_DATA_OTHER '_'
 #define SYMBOL_DATA_BOOLEAN 'B'
 #define SYMBOL_DATA_INTEGER 'I'
 #define SYMBOL_DATA_STRING  'S'
@@ -26,8 +27,8 @@
 #define STR_TRUE    "true"
 #define STR_FALSE   "false"
 
-#define REGEX_PATTERN_BOOLEAN   "^(true|false)(,|}|]| |\n|\r|\t).*$"
-#define REGEX_PATTERN_FLOAT     "^[0-9]+(\\.)[0-9]+(,|}|]| |\n|\r|\t)?.*$"
-#define REGEX_PATTERN_INTEGER   "^[0-9]+(,|}|]| |\n|\r|\t)?.*$"
-
+#define REGEX_PATTERN_BOOLEAN   "^(true|false)(,|}|]| |\n|\r|\t){1}.*$"
+#define REGEX_PATTERN_INTEGER   "^[0-9]+(,|}|]| |\n|\r|\t){1}.*$"
+#define REGEX_PATTERN_FLOAT     "^[0-9]+(.)[0-9]+(,|}|]| |\n|\r|\t){1}.*$"
+#define REGEX_PATTERN_STRING    "^[a-zA-Z0-9|,|:|{|}|[|]| ]*(\")(,|:|}|]| |\n|\r|\t){1}.*$"
 #endif //__JERIF_RSC_H__
