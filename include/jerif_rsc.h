@@ -30,5 +30,5 @@
 #define REGEX_PATTERN_BOOLEAN   "^(true|false)(,|}|]| |\n|\r|\t){1}.*$"
 #define REGEX_PATTERN_INTEGER   "^[0-9]+(,|}|]| |\n|\r|\t){1}.*$"
 #define REGEX_PATTERN_FLOAT     "^[0-9]+(.)[0-9]+(,|}|]| |\n|\r|\t){1}.*$"
-#define REGEX_PATTERN_STRING    "^[a-zA-Z0-9|,|:|{|}|[|]| ]*(\")(,|:|}|]| |\n|\r|\t){1}.*$"
+#define REGEX_PATTERN_STRING    "^(.)*(\"){0}(,|:|}|]| |\n|\r|\t){1}.*$"
 #endif //__JERIF_RSC_H__

@@ -221,24 +221,13 @@ jerif_bool is_space_symbol(char c)
     }
 }
 
-jerif_err jerif_check_validation(const char* json_str)
+jerif_err tokenize(jerif_stack* s, const char* json_str)
 {
     jerif_err err_code = jerif_ok;
-    jerif_stack s;
     jerif_bool data_flag = jerif_false;
     jerif_bool qoute_open_flag = jerif_false;
     int str_length = (int)strlen(json_str);
     int i;
-
-    if(json_str==NULL){
-        return jerif_err_invalid_argument;
-    }
-
-    err_code = jerif_stack_init(&s);
-    if(err_code){
-        printf("jerif_stack_init failed!\n");
-        return -1;
-    }
 
     // tokenize and push in stack
     for(i=0; i<str_length; i++){
@@ -260,14 +249,14 @@ jerif_err jerif_check_validation(const char* json_str)
 #endif
             }
 
-            err_code = jerif_stack_push(&s, json_str[i]);
+            err_code = jerif_stack_push(s, json_str[i]);
             if(err_code){
-                break;
+                return err_code;
             }
         }
-        else if(jerif_false == is_space_symbol(json_str[i])){
+        else if(!is_space_symbol(json_str[i])){
             if(!data_flag){
-                if(s.stk[s.top] != SYMBOL_DOUBLE_QOUTE){
+                if(s->stk[s->top] != SYMBOL_DOUBLE_QOUTE){
                     char symbol = SYMBOL_DATA_OTHER;
                     // check boolean
                     if(jerif_detect_boolean(&(json_str[i]))){
@@ -283,13 +272,13 @@ jerif_err jerif_check_validation(const char* json_str)
                     }
 #if DEBUG_PRINT_ENABLE
                     else {
-                        printf("[%s] no push: %d\n", __FUNCTION__, json_str[i]);
+                        printf("[%s(%d)] no push: %d\n", __FUNCTION__, __LINE__, json_str[i]);
                     }
 #endif
                     if(SYMBOL_DATA_OTHER != symbol){
-                        err_code = jerif_stack_push(&s, symbol);
+                        err_code = jerif_stack_push(s, symbol);
                         if(err_code){
-                            break;
+                            return err_code;
                         }
                     }
                     data_flag = jerif_true;
@@ -302,17 +291,17 @@ jerif_err jerif_check_validation(const char* json_str)
                     if(jerif_detect_string(&(json_str[i]))){
                         char *loc;
 
-                        err_code = jerif_stack_push(&s, SYMBOL_DATA_STRING);
+                        err_code = jerif_stack_push(s, SYMBOL_DATA_STRING);
                         if(err_code){
-                            break;
+                            return err_code;
                         }
-                        err_code = jerif_stack_push(&s, SYMBOL_DOUBLE_QOUTE);
+                        err_code = jerif_stack_push(s, SYMBOL_DOUBLE_QOUTE);
                         if(err_code){
-                            break;
+                            return err_code;
                         }
 
+                        // move pointer location to next qoute
                         loc = strchr(&json_str[i], SYMBOL_DOUBLE_QOUTE);
-                        //printf("%p, %p, i=%ld\n",loc, &json_str[i], loc - &json_str[i]);
                         i += loc - &json_str[i];
 
                         qoute_open_flag = jerif_false;
@@ -325,9 +314,33 @@ jerif_err jerif_check_validation(const char* json_str)
         }
 #if DEBUG_PRINT_ENABLE
         else{
-            printf("[%s] no push: %d\n", __FUNCTION__, json_str[i]);
+            printf("[%s(%d)] no push: %d\n", __FUNCTION__, __LINE__, json_str[i]);
         }
 #endif
+    }
+
+    return jerif_ok;
+}
+
+jerif_err jerif_check_validation(const char* json_str)
+{
+    jerif_err err_code = jerif_ok;
+    jerif_stack s;
+
+    if(json_str==NULL){
+        return jerif_err_invalid_argument;
+    }
+
+    err_code = jerif_stack_init(&s);
+    if(err_code){
+        printf("jerif_stack_init failed!\n");
+        return err_code;
+    }
+
+    err_code = tokenize(&s, json_str);
+    if(err_code){
+        printf("json-tokenizing failed\n");
+        return err_code;
     }
 
     return check_syntax(&s);
