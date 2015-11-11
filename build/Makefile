@@ -7,8 +7,9 @@ LIB_FULL_NAME = $(LIB_NAME).a
 LIBS = -l$(TARGET_NAME)
 
 # SOURCES
-SRCS = 	jerif_check.c \
-		jerif_stack.c \
+SRCS = 	jerif_stack.c \
+		jerif_check.c \
+		jerif_detect.c \
 		jerif_misc.c
 
 OBJS = $(SRCS:%.c=$(OBJ_PATH)/%.o)

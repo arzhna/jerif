@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <string.h>
-#include <regex.h>
 
 #include "jerif_rsc.h"
 #include "jerif_stack.h"
+#include "jerif_detect.h"
 #include "jerif_check.h"
 
 #define DEBUG_PRINT_ENABLE  0
@@ -16,7 +16,7 @@ jerif_bool is_pair(jerif_stack *s)
     int bracket_toggle=0;
 
     for(i=0; i<MAX_STACK_SIZE; i++){
-        if(s->stk[i] == SYMBOL_DOUBLE_QOUTE){
+        if(s->stk[i]== SYMBOL_DOUBLE_QOUTE){
             qoute_count++;
         }else if(s->stk[i]==SYMBOL_BRACE_OPEN){
             brace_toggle++;
@@ -31,7 +31,7 @@ jerif_bool is_pair(jerif_stack *s)
 
     if(((qoute_count%2)!=0) || (brace_toggle!=0) || (bracket_toggle!=0)){
 #if DEBUG_PRINT_ENABLE
-        //printf("qoute_count: %d, brace_toggle: %d, bracket_toggle=%d\n", qoute_count, brace_toggle, bracket_toggle);
+        printf("qoute_count: %d, brace_toggle: %d, bracket_toggle=%d\n", qoute_count, brace_toggle, bracket_toggle);
 #endif
         return jerif_false;
     }else{
@@ -44,7 +44,7 @@ jerif_bool is_valid_item(char prev, char item, jerif_bool in_bracket)
     jerif_bool result = jerif_true;
 
 #if DEBUG_PRINT_ENABLE
-    //printf("%c %c (%d)\n", item, prev, in_bracket);
+    printf("%c %c (%d)\n", item, prev, in_bracket);
 #endif
     switch(prev){
         case SYMBOL_NULL:
@@ -188,12 +188,22 @@ jerif_err check_syntax(jerif_stack *s)
     return err_code;
 }
 
-jerif_bool is_syntatic_symbol(char c)
+jerif_bool is_syntactic_symbol(char c)
 {
-    if( c == SYMBOL_BRACE_OPEN || c == SYMBOL_BRACE_CLOSE ||
-        c == SYMBOL_BRACKET_OPEN || c == SYMBOL_BRACKET_CLOSE ||
-        c == SYMBOL_DOUBLE_QOUTE || c == SYMBOL_COLON ||
-        c == SYMBOL_COMMA ){
+    if( SYMBOL_BRACE_OPEN == c || SYMBOL_BRACE_CLOSE == c ||
+        SYMBOL_BRACKET_OPEN == c || SYMBOL_BRACKET_CLOSE == c ||
+        SYMBOL_DOUBLE_QOUTE == c || SYMBOL_COLON == c ||
+        SYMBOL_COMMA == c ){
+        return jerif_true;
+    }
+    else{
+        return jerif_false;
+    }
+}
+
+jerif_bool is_double_qoute(char c)
+{
+    if(SYMBOL_DOUBLE_QOUTE == c){
         return jerif_true;
     }
     else{
@@ -203,7 +213,7 @@ jerif_bool is_syntatic_symbol(char c)
 
 jerif_bool is_space_symbol(char c)
 {
-    if( c <= SYMBOL_SPACE ){
+    if( SYMBOL_SPACE >= c ){
         return jerif_true;
     }
     else{
@@ -211,74 +221,13 @@ jerif_bool is_space_symbol(char c)
     }
 }
 
-jerif_bool is_boolean(const char* str)
-{
-    int status;
-    regex_t state;
-    const char *pattern = REGEX_PATTERN_BOOLEAN;
-
-    if (regcomp(&state, pattern, REG_EXTENDED)){
-        return jerif_false;
-    }
-
-    status = regexec(&state, str, 0, NULL, 0);
-#if DEBUG_PRINT_ENABLE
-    printf("[%s] %s: %s\n", __FUNCTION__, str, status == 0 ? "match" : "no match");
-#endif
-    if(status){
-        return jerif_false;
-    }
-
-    return jerif_true;
-}
-
-jerif_bool is_integer(const char* str)
-{
-    int status;
-    regex_t state;
-    const char *pattern = REGEX_PATTERN_INTEGER;
-
-    if (regcomp(&state, pattern, REG_EXTENDED)){
-        return jerif_false;
-    }
-
-    status = regexec(&state, str, 0, NULL, 0);
-#if DEBUG_PRINT_ENABLE
-    printf("[%s] %s: %s(%d)\n", __FUNCTION__, str, status == 0 ? "match" : "no match", status);
-#endif
-    if(status){
-        return jerif_false;
-    }
-
-    return jerif_true;
-}
-
-jerif_bool is_float(const char* str)
-{
-    int status;
-    regex_t state;
-    const char *pattern = REGEX_PATTERN_FLOAT;
-
-    if (regcomp(&state, pattern, REG_EXTENDED)){
-        return jerif_false;
-    }
-
-    status = regexec(&state, str, 0, NULL, 0);
-#if DEBUG_PRINT_ENABLE
-    printf("[%s] %s: %s(%d)\n", __FUNCTION__, str, status == 0 ? "match" : "no match", status);
-#endif
-    if(status){
-        return jerif_false;
-    }
-
-    return jerif_true;
-}
-
 jerif_err jerif_check_validation(const char* json_str)
 {
     jerif_err err_code = jerif_ok;
     jerif_stack s;
-    jerif_bool data_toggle=jerif_false;
+    jerif_bool data_flag = jerif_false;
+    jerif_bool qoute_open_flag = jerif_false;
+    int str_length = (int)strlen(json_str);
     int i;
 
     if(json_str==NULL){
@@ -291,32 +240,45 @@ jerif_err jerif_check_validation(const char* json_str)
         return -1;
     }
 
-    // TODO: implement to check validation
-    for(i=0; i<(int)strlen(json_str); i++){
-        if(is_syntatic_symbol(json_str[i])){
-            if(data_toggle){
-                data_toggle = jerif_false;
+    // tokenize and push in stack
+    for(i=0; i<str_length; i++){
+#if DEBUG_PRINT_ENABLE
+        printf("%c\n", json_str[i]);
+#endif
+        if(is_syntactic_symbol(json_str[i]) && !qoute_open_flag){
+            if(data_flag){
+                data_flag = jerif_false;
+#if DEBUG_PRINT_ENABLE
+                printf("bool or decimal data end\n");
+#endif
             }
+
+            if(SYMBOL_DOUBLE_QOUTE==json_str[i] && !qoute_open_flag){
+                qoute_open_flag = jerif_true;
+#if DEBUG_PRINT_ENABLE
+                printf("qoute opened\n");
+#endif
+            }
+
             err_code = jerif_stack_push(&s, json_str[i]);
             if(err_code){
                 break;
             }
-        }else if(jerif_false == is_space_symbol(json_str[i])){
-            char symbol = SYMBOL_DATA_STRING;
-            if(data_toggle == jerif_false){
-                // check boolean
+        }
+        else if(jerif_false == is_space_symbol(json_str[i])){
+            if(!data_flag){
                 if(s.stk[s.top] != SYMBOL_DOUBLE_QOUTE){
-                    if(json_str[i] == SYMBOL_DATA_BOOL_TRUE || json_str[i] == SYMBOL_DATA_BOOL_FALSE){
-                        if(is_boolean(&(json_str[i]))){
-                            symbol = SYMBOL_DATA_BOOLEAN;
-                        }
+                    char symbol = SYMBOL_DATA_OTHER;
+                    // check boolean
+                    if(jerif_detect_boolean(&(json_str[i]))){
+                        symbol = SYMBOL_DATA_BOOLEAN;
                     }
                     // check integer
-                    else if(is_integer(&(json_str[i]))){
+                    else if(jerif_detect_integer(&(json_str[i]))){
                         symbol = SYMBOL_DATA_INTEGER;
                     }
                     // check float
-                    else if(is_float(&(json_str[i]))){
+                    else if(jerif_detect_float(&(json_str[i]))){
                         symbol = SYMBOL_DATA_INTEGER;
                     }
 #if DEBUG_PRINT_ENABLE
@@ -324,13 +286,41 @@ jerif_err jerif_check_validation(const char* json_str)
                         printf("[%s] no push: %d\n", __FUNCTION__, json_str[i]);
                     }
 #endif
+                    if(SYMBOL_DATA_OTHER != symbol){
+                        err_code = jerif_stack_push(&s, symbol);
+                        if(err_code){
+                            break;
+                        }
+                    }
+                    data_flag = jerif_true;
+#if DEBUG_PRINT_ENABLE
+                    printf("bool or decimal data start\n");
+#endif
                 }
+                else{
+                    // check string
+                    if(jerif_detect_string(&(json_str[i]))){
+                        char *loc;
 
-                err_code = jerif_stack_push(&s, symbol);
-                if(err_code){
-                    break;
+                        err_code = jerif_stack_push(&s, SYMBOL_DATA_STRING);
+                        if(err_code){
+                            break;
+                        }
+                        err_code = jerif_stack_push(&s, SYMBOL_DOUBLE_QOUTE);
+                        if(err_code){
+                            break;
+                        }
+
+                        loc = strchr(&json_str[i], SYMBOL_DOUBLE_QOUTE);
+                        //printf("%p, %p, i=%ld\n",loc, &json_str[i], loc - &json_str[i]);
+                        i += loc - &json_str[i];
+
+                        qoute_open_flag = jerif_false;
+#if DEBUG_PRINT_ENABLE
+                        printf("qoute closed\n");
+#endif
+                    }
                 }
-                data_toggle = jerif_true;
             }
         }
 #if DEBUG_PRINT_ENABLE
