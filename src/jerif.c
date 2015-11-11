@@ -21,7 +21,7 @@ void printf_help(void)
     print_usage();
     printf("Options are ...\n");
     printf("\t%s\t\tDisplay the program version.\n", OPTION_VERSION);
-    printf("\t%s\t\tDisplay this help message.\n", OPTION_VERSION);
+    printf("\t%s\t\tDisplay this help message.\n", OPTION_HELP);
 }
 
 int main(int argc, char* argv[])
