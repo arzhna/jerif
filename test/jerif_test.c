@@ -1,7 +1,12 @@
 #include <stdio.h>
 
 #include "jerif_stack.h"
+#include "jerif_detect.h"
 #include "jerif_check.h"
+
+#define STACK_TEST_ENABLE 1
+#define DETECT_FUNC_TEST_ENABLE 1
+#define VALIDATOR_TEST_ENABLE 1
 
 #define DO_NOTHING()
 
@@ -125,8 +130,83 @@ int stack_test(void){
     }
 }
 
-#define VALIDATOR_TEST_CASE_COUNT  14    //10
-char *TEST_CASE_JSON_STR[] = {
+#define DETECT_BOOL_CASE    8
+#define DETECT_INT_CASE     6
+#define DETECT_FLOAT_CASE   7
+#define DETECT_STRING_CASE  5
+#define DETECT_DATA_TEST_CASE_COUNT DETECT_BOOL_CASE + DETECT_INT_CASE + DETECT_FLOAT_CASE + DETECT_STRING_CASE
+char *detect_data_test_case_str[] = {
+    // boolean detection cases
+    "true ", "false ", "true,", "false}", "true]", ":false,", "true-false", "false:",
+    // integer detection cases
+    "1 ", "123, ", "1029384756]", "1213},", "26.362,", "\"123\",",
+    // float detection cases
+    "0.1, ", "0.1234 ", "643512.65324235}", "3.14]", "1,", "ab.cc, ", "\"57.23\"",
+    // string detection cases
+    "string\",", "str:ing\" ", "str,ing\"}", "str{i}ng\"]", "s[t]r,i:{n}g\":"
+};
+
+jerif_err detect_data_test_case_expected_result[] = {
+    // expected result of boolean detection
+    jerif_true, jerif_true, jerif_true, jerif_true, jerif_true, jerif_false, jerif_false, jerif_false,
+    // expected result of integer detection
+    jerif_true, jerif_true, jerif_true, jerif_true, jerif_false, jerif_false,
+    // expected result of float detection
+    jerif_true, jerif_true, jerif_true, jerif_true, jerif_false, jerif_false, jerif_false,
+    // expected result of string detection
+    jerif_true, jerif_true, jerif_true, jerif_true, jerif_true,
+};
+
+int detecting_data_test(void)
+{
+    int i=0;
+    int success_count=0;
+    jerif_err err_code = jerif_ok;
+
+    for(i=0; i<DETECT_DATA_TEST_CASE_COUNT; i++){
+        if(i < DETECT_BOOL_CASE){
+            if(i == 0){
+                printf("\n[boolean]\n");
+            }
+            printf("Test Case #%d\n", i+1);
+            err_code = jerif_detect_boolean(detect_data_test_case_str[i]);
+            success_count += check_result(detect_data_test_case_expected_result[i] == err_code);
+        }
+        else if(i < DETECT_BOOL_CASE+DETECT_INT_CASE){
+            if(i == DETECT_BOOL_CASE){
+                printf("\n[integer]\n");
+            }
+            printf("Test Case #%d\n", i+1);
+            err_code = jerif_detect_integer(detect_data_test_case_str[i]);
+            success_count += check_result(detect_data_test_case_expected_result[i] == err_code);
+        }
+        else if(i < DETECT_BOOL_CASE+DETECT_INT_CASE+DETECT_FLOAT_CASE){
+            if(i == DETECT_BOOL_CASE+DETECT_INT_CASE){
+                printf("\n[float]\n");
+            }
+            printf("Test Case #%d\n", i+1);
+            err_code = jerif_detect_float(detect_data_test_case_str[i]);
+            success_count += check_result(detect_data_test_case_expected_result[i] == err_code);
+        }
+        else {
+            if(i == DETECT_BOOL_CASE+DETECT_INT_CASE+DETECT_FLOAT_CASE){
+                printf("\n[string]\n");
+            }
+            printf("Test Case #%d\n", i+1);
+            err_code = jerif_detect_string(detect_data_test_case_str[i]);
+            success_count += check_result(detect_data_test_case_expected_result[i] == err_code);
+        }
+    }
+
+    if(success_count >= DETECT_DATA_TEST_CASE_COUNT){
+        return 0;
+    }else{
+        return -1;
+    }
+}
+
+int validator_test_case_count = 16;
+char *validator_test_case_json_str[] = {
     // valid cases, 7
     "{\"string\":\"100 strings\", \"int\":0.1, \"bool\":false }",
     "{\"string\":\"string\", \"int\":1029384756, \"group\":{\"string\":\"string\", \"int\":88}, \"bool\":true}",
@@ -146,8 +226,12 @@ char *TEST_CASE_JSON_STR[] = {
     // complex cases, 2
     "{\"problems\": [{\"Diabetes\": [{\"medications\": [{\"medicationsClasses\": [{\"className\": [{\"associatedDrug\": [{\"name\": \"asprin\", \"dose\": \"\", \"strength\": \"500 mg\"}], \"associatedDrug#2\": [{\"name\": \"somethingElse\", \"dose\": \"\", \"strength\": \"500 mg\"}]}], \"className2\": [{\"associatedDrug\": [{\"name\": \"asprin\", \"dose\": \"\",\"strength\": \"500 mg\"}], \"associatedDrug#2\": [{\"name\": \"somethingElse\", \"dose\": \"\", \"strength\": \"500 mg\"}]}]}]}], \"labs\": [{\"missing_field\": \"missing_value\"}]}], \"Asthma\": [{}]}]}",
     "{\"id\": \"0001\", \"type\": \"donut\", \"name\": \"Cake\", \"ppu\": 0.55, \"batters\":{\"batter\":[{\"id\": \"1001\", \"type\": \"Regular\"},	{ \"id\": \"1002\", \"type\": \"Chocolate\" }, { \"id\": \"1003\", \"type\": \"Blueberry\" }, { \"id\": \"1004\", \"type\": \"Devil's Food\" }]}, \"topping\": [{ \"id\": \"5001\", \"type\": \"None\" }, { \"id\": \"5002\", \"type\": \"Glazed\" }, { \"id\": \"5005\", \"type\": \"Sugar\" }, { \"id\": \"5007\", \"type\": \"Powdered Sugar\" }, { \"id\": \"5006\", \"type\": \"Chocolate with Sprinkles\" }, { \"id\": \"5003\", \"type\": \"Chocolate\" }, { \"id\": \"5004\", \"type\": \"Maple\" }]}",
+
+    // additoinal cases 2
+    "{\"string\":123.24534523476542376, \"str,ing\":5623462345145243}",
+    "{\"string\":\"str:ing\", \"str,ing\":\"[a],{b},c:\"}",
 };
-jerif_err TEST_CASE_RESULT[] = {
+jerif_err validator_test_case_expected_result[] = {
     jerif_ok,
     jerif_ok,
     jerif_ok,
@@ -160,6 +244,8 @@ jerif_err TEST_CASE_RESULT[] = {
     jerif_err_invalid_json,
     jerif_err_invalid_json,
     jerif_err_invalid_json,
+    jerif_ok,
+    jerif_ok,
     jerif_ok,
     jerif_ok,
 };
@@ -167,17 +253,16 @@ jerif_err TEST_CASE_RESULT[] = {
 int validator_test(void)
 {
     int i=0;
-    int test_case = VALIDATOR_TEST_CASE_COUNT;
     int success_count=0;
     jerif_err err_code = jerif_ok;
 
-    for(i=0; i<test_case; i++){
+    for(i=0; i<validator_test_case_count; i++){
         printf("Test Case #%d\n", i+1);
-        err_code = jerif_check_validation(TEST_CASE_JSON_STR[i]);
-        success_count += check_result(err_code==TEST_CASE_RESULT[i]);
+        err_code = jerif_check_validation(validator_test_case_json_str[i]);
+        success_count += check_result(validator_test_case_expected_result[i] == err_code);
     }
 
-    if(success_count >= test_case){
+    if(success_count >= validator_test_case_count){
         return 0;
     }else{
         return -1;
@@ -188,19 +273,32 @@ int main (void)
 {
     jerif_err err_code = jerif_ok;
 
+#if STACK_TEST_ENABLE
     printf("[STACK TEST]\n");
     if(stack_test()){
         printf("Stack test is FAILED!!!\n\n");
     }else{
         printf("Stack test is SUCCESS!!!\n\n");
     }
+#endif
 
+#if DETECT_FUNC_TEST_ENABLE
+    printf("[DETECTING TEST]\n");
+    if(detecting_data_test()){
+        printf("Detecting data test is FAILED!!!\n\n");
+    }else{
+        printf("Detecting data test is SUCCESS!!!\n\n");
+    }
+#endif
+
+#if VALIDATOR_TEST_ENABLE
     printf("[VALIDATOR TEST]\n");
     if(validator_test()){
         printf("Validator test is FAILED!!!\n\n");
     }else{
         printf("Validator test is SUCCESS!!!\n\n");
     }
+#endif
 
     return 0;
 }
