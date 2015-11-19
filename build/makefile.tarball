@@ -1,0 +1,52 @@
+include tool.inc
+
+TARBALL_NAME = jerif
+TARBALL_PATH = $(TARBALL_NAME)
+
+INC_FILES = jerif_check.h \
+            jerif_detect.h \
+            jerif_misc.h \
+            jerif_stack.h \
+            jerif_rsc.h \
+            jerif_types.h \
+            jerif_ver.h \
+            jerif.h
+
+SRC_FILES = jerif_check.c \
+            jerif_detect.c \
+            jerif_misc.c \
+            jerif_stack.c \
+            jerif.c
+
+INC_FILE_LIST = $(addprefix $(INC_PATH)/,$(INC_FILES))
+SRC_FILE_LIST = $(addprefix $(SRC_PATH)/,$(SRC_FILES))
+
+#.PHONY: all
+all: make_temp_path copy_files make_tarball remove_temp_path
+
+make_temp_path:
+	@echo "make the jerif-$(GIT_TAG) distribution tarball for android"
+	-@$(MKDIR) $(OUT_PATH)
+	@$(MKDIR) $(TARBALL_PATH)
+	@$(MKDIR) $(TARBALL_PATH)/include
+	@$(MKDIR) $(TARBALL_PATH)/src
+
+copy_files:
+	@echo "copy build files..."
+	@$(CP) $(BUILD_PATH)/Android.mk $(TARBALL_PATH)
+	@echo "copy include files..."
+	@$(CP) $(INC_FILE_LIST) $(TARBALL_PATH)/include
+	@echo "copy source files..."
+	@$(CP) $(SRC_FILE_LIST) $(TARBALL_PATH)/src
+
+make_tarball:
+	@echo "make tarball..."
+	@$(TARBALL) $(OUT_PATH)/$(TARBALL_NAME)-$(GIT_TAG).tar $(TARBALL_NAME)
+	@echo "\t==> $(OUT_PATH)/$(TARBALL_NAME)-$(GIT_TAG).tar"
+
+remove_temp_path:
+	@echo "remove temporary directory"
+	@$(RM) -rf $(TARBALL_PATH)
+
+clean:
+	@echo "$(RM) -rf $(TARBALL_NAME)-$(GIT_TAG).tar $(addprefix $(INC_PATH)/,jerif_ver.h)"

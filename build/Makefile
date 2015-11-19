@@ -52,7 +52,6 @@ TARGET_SRSC = jerif.c
 
 # Tester Target
 TESTER = libjerif_test
-TESTER_PATH = $(HOME_PATH)/test
 TESTER_SRCS = jerif_test.c
 TESTER_BIN_PATH = $(BIN_PATH)
 
@@ -108,10 +107,14 @@ $(TARGET_NAME):
 
 clean:
 	@echo "= Clean $(TARGET_NAME) "
-	@$(RM) -rf $(OBJ_PATH) $(LIB_PATH) $(BIN_PATH) $(INC_PATH)/$(VERSION_FILE_NAME).h
+	@$(RM) -rf $(OUT_PATH) $(OBJ_PATH) $(LIB_PATH) $(BIN_PATH) $(INC_PATH)/$(VERSION_FILE_NAME).h
 	@echo
 
-distclean: uninstall clean
+tarball: version
+	@$(MAKE) -f makefile.tarball
+
+tarball-clean:
+	@$(MAKE) -f makefile.tarball clean
 
 install:
 	@echo "==========================="
