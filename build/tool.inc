@@ -15,6 +15,8 @@ BIN_PATH = $(HOME_PATH)/bin
 OUT_PATH = $(HOME_PATH)/out
 INC_PATH = $(HOME_PATH)/include
 SRC_PATH = $(HOME_PATH)/src
+BUILD_PATH = $(HOME_PATH)/build
+TESTER_PATH = $(HOME_PATH)/test
 
 # build tools
 MAKE = make
@@ -25,7 +27,7 @@ CD = cd
 CP = cp
 LN = ln
 MKDIR = mkdir
-TARBALL = tar cvf
+TARBALL = tar cf
 
 # version
 GIT_TAG = $(shell git describe master --abbrev=0)
