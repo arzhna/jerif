@@ -205,7 +205,7 @@ int detecting_data_test(void)
     }
 }
 
-int validator_test_case_count = 16;
+int validator_test_case_count = 18;
 char *validator_test_case_json_str[] = {
     // valid cases, 7
     "{\"string\":\"100 strings\", \"int\":0.1, \"bool\":false }",
@@ -230,6 +230,8 @@ char *validator_test_case_json_str[] = {
     // additoinal cases 2
     "{\"string\":123.24534523476542376, \"str,ing\":5623462345145243}",
     "{\"string\":\"str:ing\", \"str,ing\":\"[a],{b},c:\"}",
+    "{\"string\":string, \"bool\":true}",
+    "{\"string\":string}",
 };
 jerif_err validator_test_case_expected_result[] = {
     jerif_ok,
@@ -248,6 +250,8 @@ jerif_err validator_test_case_expected_result[] = {
     jerif_ok,
     jerif_ok,
     jerif_ok,
+    jerif_err_invalid_json,
+    jerif_err_invalid_json,
 };
 
 int validator_test(void)
