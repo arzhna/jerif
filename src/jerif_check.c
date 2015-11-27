@@ -57,7 +57,6 @@ jerif_bool is_valid_item(char prev, char item, jerif_bool in_bracket)
                 item!=SYMBOL_BRACE_CLOSE &&
                 item!=SYMBOL_BRACKET_CLOSE &&
                 item!=SYMBOL_DOUBLE_QOUTE &&
-                item!=SYMBOL_COLON &&
                 item!=SYMBOL_DATA_STRING &&
                 item!=SYMBOL_DATA_INTEGER &&
                 item!=SYMBOL_DATA_BOOLEAN){
@@ -238,7 +237,7 @@ jerif_err tokenize(jerif_stack* s, const char* json_str)
             if(data_flag){
                 data_flag = jerif_false;
 #if DEBUG_PRINT_ENABLE
-                printf("bool or decimal data end\n");
+                printf("data end\n");
 #endif
             }
 
@@ -283,7 +282,7 @@ jerif_err tokenize(jerif_stack* s, const char* json_str)
                     }
                     data_flag = jerif_true;
 #if DEBUG_PRINT_ENABLE
-                    printf("bool or decimal data start\n");
+                    printf("data start\n");
 #endif
                 }
                 else{
