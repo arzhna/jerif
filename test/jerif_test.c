@@ -205,7 +205,7 @@ int detecting_data_test(void)
     }
 }
 
-int validator_test_case_count = 18;
+int validator_test_case_count = 21;
 char *validator_test_case_json_str[] = {
     // valid cases, 7
     "{\"string\":\"100 strings\", \"int\":0.1, \"bool\":false }",
@@ -227,11 +227,14 @@ char *validator_test_case_json_str[] = {
     "{\"problems\": [{\"Diabetes\": [{\"medications\": [{\"medicationsClasses\": [{\"className\": [{\"associatedDrug\": [{\"name\": \"asprin\", \"dose\": \"\", \"strength\": \"500 mg\"}], \"associatedDrug#2\": [{\"name\": \"somethingElse\", \"dose\": \"\", \"strength\": \"500 mg\"}]}], \"className2\": [{\"associatedDrug\": [{\"name\": \"asprin\", \"dose\": \"\",\"strength\": \"500 mg\"}], \"associatedDrug#2\": [{\"name\": \"somethingElse\", \"dose\": \"\", \"strength\": \"500 mg\"}]}]}]}], \"labs\": [{\"missing_field\": \"missing_value\"}]}], \"Asthma\": [{}]}]}",
     "{\"id\": \"0001\", \"type\": \"donut\", \"name\": \"Cake\", \"ppu\": 0.55, \"batters\":{\"batter\":[{\"id\": \"1001\", \"type\": \"Regular\"},	{ \"id\": \"1002\", \"type\": \"Chocolate\" }, { \"id\": \"1003\", \"type\": \"Blueberry\" }, { \"id\": \"1004\", \"type\": \"Devil's Food\" }]}, \"topping\": [{ \"id\": \"5001\", \"type\": \"None\" }, { \"id\": \"5002\", \"type\": \"Glazed\" }, { \"id\": \"5005\", \"type\": \"Sugar\" }, { \"id\": \"5007\", \"type\": \"Powdered Sugar\" }, { \"id\": \"5006\", \"type\": \"Chocolate with Sprinkles\" }, { \"id\": \"5003\", \"type\": \"Chocolate\" }, { \"id\": \"5004\", \"type\": \"Maple\" }]}",
 
-    // additoinal cases 2
+    // additoinal cases 7
     "{\"string\":123.24534523476542376, \"str,ing\":5623462345145243}",
     "{\"string\":\"str:ing\", \"str,ing\":\"[a],{b},c:\"}",
     "{\"string\":string, \"bool\":true}",
     "{\"string\":string}",
+    "{\"string\":\"string\", \"integer\\:1\"}",
+    "{\"string\":\"string\", \"no_value\"}",
+    "{\"string\":\"string\" \"integer\":1}"
 };
 jerif_err validator_test_case_expected_result[] = {
     jerif_ok,
@@ -250,6 +253,9 @@ jerif_err validator_test_case_expected_result[] = {
     jerif_ok,
     jerif_ok,
     jerif_ok,
+    jerif_err_invalid_json,
+    jerif_err_invalid_json,
+    jerif_err_invalid_json,
     jerif_err_invalid_json,
     jerif_err_invalid_json,
 };
