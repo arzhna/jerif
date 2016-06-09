@@ -179,11 +179,11 @@ jerif_err check_syntax(jerif_stack *s)
 #if DEBUG_PRINT_ENABLE
     jerif_stack_dump(s);
 #endif
+
     if( (jerif_false == is_pair(s)) ||
         (jerif_false == is_valid_syntax(s, 0, jerif_false))){
         err_code = jerif_err_invalid_json;
     }
-
     return err_code;
 }
 
@@ -289,6 +289,7 @@ jerif_err tokenize(jerif_stack* s, const char* json_str)
                     // check string
                     if(jerif_detect_string(&(json_str[i]))){
                         char *loc;
+                        int distance;
 
                         err_code = jerif_stack_push(s, SYMBOL_DATA_STRING);
                         if(err_code){
@@ -301,12 +302,19 @@ jerif_err tokenize(jerif_stack* s, const char* json_str)
 
                         // move pointer location to next qoute
                         loc = strchr(&json_str[i], SYMBOL_DOUBLE_QOUTE);
-                        i += loc - &json_str[i];
-
-                        qoute_open_flag = jerif_false;
+                        distance = loc - &json_str[i];
 #if DEBUG_PRINT_ENABLE
-                        printf("qoute closed\n");
+                        printf("distance=%d, i=%d\n", distance, i);
 #endif
+                        if(distance > (str_length - i) || distance < 0){
+                            return jerif_err_invalid_json;
+                        }else{
+                            i += distance;
+                            qoute_open_flag = jerif_false;
+#if DEBUG_PRINT_ENABLE
+                            printf("qoute closed\n");
+#endif
+                        }
                     }
                 }
             }
